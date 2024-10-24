@@ -19,6 +19,9 @@
 #define DEBUG_PRINT(fmt, ...) do {} while (0)
 #endif
 
+#define RESOLUTION_WIDTH 1080
+#define RESOLUTION_HEIGHT 1920
+
 typedef struct game_context game_context_t;
 
 enum state_name {

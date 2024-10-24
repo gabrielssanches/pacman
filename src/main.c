@@ -42,8 +42,10 @@ int main(int argc, char *argv[]) {
     SetConfigFlags(FLAG_WINDOW_UNDECORATED);
 
     // pacman original screen resolution is 224x288
-    // the tile size is 8x8 px
-    InitWindow(1920, 1080, "pacman");
+    // the tile size is 8x8 px, so 28x36 tiles
+    // this clone is intended to be played at 1080p vertical
+    // so scaling the tile size to 32x32 px fits :D
+    InitWindow(1080, 1920, "pacman clone by gabrielssanches");
 
     //DisableCursor();
 
@@ -62,7 +64,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(PLATFORM_WEB)
     EM_ASM({ window.onkeydown = function(e) { return !(e.keyCode == 32); }; });
-    emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
+    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
 #else
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
