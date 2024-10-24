@@ -6,6 +6,12 @@ static int tile;
 static float game_time;
 static Camera2D camera = { 0 };
 
+struct pacman {
+    Vector2 vel;
+    Vector2 pos;
+};
+struct pacman pacman;
+
 static void game_enter(struct game_context *gctx) {
     sprite_sheet = LoadTexture("resources/sprites/map.png");
     sprite_characters = LoadTexture("resources/sprites/characters.png");
@@ -15,7 +21,11 @@ static void game_enter(struct game_context *gctx) {
     camera.target = Vector2Zero();
     camera.offset = Vector2Zero();
     camera.rotation = 0.0f;
-    camera.zoom = (10*GetScreenHeight()/RESOLUTION_HEIGHT)/10.0f;
+    camera.zoom = 1.0f;
+    //camera.zoom = (10*GetScreenHeight()/RESOLUTION_HEIGHT)/10.0f;
+
+    pacman.pos = Vector2Zero();
+    pacman.vel = Vector2Zero();
 }
 
 static void game_update(struct game_context *gctx) {
@@ -30,7 +40,26 @@ static void game_update(struct game_context *gctx) {
     }
     //camera.zoom = (10*GetScreenHeight()/RESOLUTION_HEIGHT)/10.0f;
     //camera.zoom += 0.1f*GetMouseWheelMove();
+
+    if (IsKeyDown(KEY_DOWN)) {
+        pacman.vel.y = 1;
+        pacman.vel.x = 0;
+    }
+    if (IsKeyDown(KEY_UP)) {
+        pacman.vel.y = -1;
+        pacman.vel.x = 0;
+    }
+    if (IsKeyDown(KEY_LEFT)) {
+        pacman.vel.y = 0;
+        pacman.vel.x = -1;
+    }
+    if (IsKeyDown(KEY_RIGHT)) {
+        pacman.vel.y = 0;
+        pacman.vel.x = 1;
+    }
+    pacman.pos = Vector2Add(pacman.pos, pacman.vel);
 }
+
 static int tilemap[952] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,5,5,5,5,5,5,5,5,5,5,5,5,6,1,5,5,5,5,5,5,5,5,5,5,5,5,6,4,0,0,0,0,0,0,0,0,0,0,0,0,7,4,0,0,0,0,0,0,0,0,0,0,0,0,7,4,0,20,18,18,22,0,20,18,18,18,22,0,7,4,0,20,18,18,18,22,0,20,18,18,22,0,7,4,0,7,24,24,4,0,7,24,24,24,4,0,7,4,0,7,24,24,24,4,0,7,24,24,4,0,7,4,0,21,5,5,23,0,21,5,5,5,23,0,21,23,0,21,5,5,5,23,0,21,5,5,23,0,7,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,4,0,20,18,18,22,0,20,22,0,20,18,18,18,18,18,18,22,0,20,22,0,20,18,18,22,0,7,4,0,21,5,5,23,0,7,4,0,21,5,5,6,1,5,5,23,0,7,4,0,21,5,5,23,0,7,4,0,0,0,0,0,0,7,4,0,0,0,0,7,4,0,0,0,0,7,4,0,0,0,0,0,0,7,2,8,8,8,8,3,0,7,17,18,18,22,0,7,4,0,20,18,18,19,4,0,13,8,8,8,8,12,0,0,0,0,0,10,0,7,1,5,5,23,0,21,23,0,21,5,5,6,4,0,10,0,0,0,0,0,0,0,0,0,0,10,0,7,4,0,0,0,0,0,0,0,0,0,0,7,4,0,10,0,0,0,0,0,0,0,0,0,0,10,0,7,4,0,13,8,8,11,11,8,8,3,0,7,4,0,10,0,0,0,0,0,8,8,8,8,8,9,0,21,23,0,10,0,0,0,0,0,0,10,0,21,23,0,14,8,8,8,8,8,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,8,8,8,8,8,3,0,20,22,0,10,0,0,0,0,0,0,10,0,20,22,0,13,8,8,8,8,8,0,0,0,0,0,10,0,7,4,0,14,8,8,8,8,8,8,9,0,7,4,0,10,0,0,0,0,0,0,0,0,0,0,10,0,7,4,0,0,0,0,0,0,0,0,0,0,7,4,0,10,0,0,0,0,0,0,0,0,0,0,10,0,7,4,0,20,18,18,18,18,18,18,22,0,7,4,0,10,0,0,0,0,0,15,8,8,8,8,9,0,21,23,0,21,5,5,6,1,5,5,23,0,21,23,0,14,8,8,8,8,16,4,0,0,0,0,0,0,0,0,0,0,0,0,7,4,0,0,0,0,0,0,0,0,0,0,0,0,7,4,0,20,18,18,22,0,20,18,18,18,22,0,7,4,0,20,18,18,18,22,0,20,18,18,22,0,7,4,0,21,5,6,4,0,21,5,5,5,23,0,21,23,0,21,5,5,5,23,0,7,1,5,23,0,7,4,0,0,0,7,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,4,0,0,0,7,17,18,22,0,7,4,0,20,22,0,20,18,18,18,18,18,18,22,0,20,22,0,7,4,0,20,18,19,1,5,23,0,21,23,0,7,4,0,21,5,5,6,1,5,5,23,0,7,4,0,21,23,0,21,5,6,4,0,0,0,0,0,0,7,4,0,0,0,0,7,4,0,0,0,0,7,4,0,0,0,0,0,0,7,4,0,20,18,18,18,18,19,17,18,18,22,0,7,4,0,20,18,18,19,17,18,18,18,18,22,0,7,4,0,21,5,5,5,5,5,5,5,5,23,0,21,23,0,21,5,5,5,5,5,5,5,5,23,0,7,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,17,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,19 };
 
 static void game_draw(struct game_context *gctx) {
@@ -49,16 +78,23 @@ static void game_draw(struct game_context *gctx) {
         }
     }
 
-    // drawp pacman
+    // draw pacman
     int pac = 1;
     Rectangle pacman_rect = { (pac*4 + 1)*32.0f, 0.0f, 32, 32};
-    DrawTextureRec(sprite_characters, pacman_rect, (Vector2){ 0.0f, 0.0f }, WHITE);
+    Vector2 pacman_rect_draw = { pacman.pos.x, pacman.pos.y };
+    DrawTextureRec(sprite_characters, pacman_rect, pacman_rect_draw, WHITE);
+
     pacman_rect.x = (pac*4 + 2)*32.0f;
-    DrawTextureRec(sprite_characters, pacman_rect, (Vector2){ 32.0f, 0.0f }, WHITE);
-    pacman_rect.x = (pac*4 + 3)*32.0f;
-    DrawTextureRec(sprite_characters, pacman_rect, (Vector2){ 0.0f, 32.0f }, WHITE);
+    pacman_rect_draw.x += 32.0f;
+    DrawTextureRec(sprite_characters, pacman_rect, pacman_rect_draw, WHITE);
+
     pacman_rect.x = (pac*4 + 4)*32.0f;
-    DrawTextureRec(sprite_characters, pacman_rect, (Vector2){ 32.0f, 32.0f }, WHITE);
+    pacman_rect_draw.y += 32.0f;
+    DrawTextureRec(sprite_characters, pacman_rect, pacman_rect_draw, WHITE);
+
+    pacman_rect.x = (pac*4 + 3)*32.0f;
+    pacman_rect_draw.x -= 32.0f;
+    DrawTextureRec(sprite_characters, pacman_rect, pacman_rect_draw, WHITE);
 
     // draw screen outline
     Rectangle screen_outline = { 0, 0, 0, 0};
