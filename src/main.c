@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     //DisableCursor();
 
     gctx.state_current = &gamestate_none;
-    gctx.state_next = &gamestate_load;
+    gctx.state_next = &gamestate_game; // FIXME: gamestate_load
     gctx.states[STATE_LOAD] = &gamestate_load;
     gctx.states[STATE_INTRO_RAYLIB] = &gamestate_intro_raylib;
     gctx.states[STATE_GAME] = &gamestate_game;
