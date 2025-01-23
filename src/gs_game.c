@@ -12,6 +12,35 @@ struct pacman {
 };
 struct pacman pacman;
 
+// character movement general rules
+// - can only move along the line
+// - can only change line if exactly on the right pixel
+// - stops if a wall is hit
+// - movement is computed a pixel at a time, indenpendent of the speed.
+//   e.g.: x0 = 10, x1=14. Then needed checks are made at 10,11,12,13,14
+//   this is dump coding at the expense of cpu cycles
+//
+// pacman:
+// - always starts moving to the left
+// - if near a crossed/corner line (define near in pixels), line change is possible
+//   this is needed so the controls are a bit more forgiving to the player
+// - held back one screen refresh if just ate a dot
+
+// line grid:
+// line x0,y0 x1,y1
+// have an array of all lines
+
+// ai:
+// - unique target for each ghost
+// - target is defined as a point. points are within lines, in a grid
+// - to reach target, calculate shortest path by weighting points to target. lowest is chosen
+
+// pacman dies:
+// - in mode MODE_A: when a ghost is in the same point as pacman
+
+// pacman eats:
+// - when pacman is in the same point as the eatable (dot/pill/fruit)
+// 
 static void game_enter(struct game_context *gctx) {
     sprite_sheet = LoadTexture("resources/sprites/map.png");
     sprite_characters = LoadTexture("resources/sprites/characters.png");
@@ -79,7 +108,7 @@ static void game_draw(struct game_context *gctx) {
     }
 
     // draw pacman
-    int pac = 1;
+    int pac = 100;
     Rectangle pacman_rect = { (pac*4 + 1)*32.0f, 0.0f, 32, 32};
     Vector2 pacman_rect_draw = { pacman.pos.x, pacman.pos.y };
     DrawTextureRec(sprite_characters, pacman_rect, pacman_rect_draw, WHITE);

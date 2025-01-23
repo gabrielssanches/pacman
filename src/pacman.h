@@ -2,7 +2,6 @@
 #define PACMAN_H 
 
 #include <raylib.h>
-#include <raygui.h>
 #include <raymath.h>
 #include <stddef.h>
 #include <stdlib.h>
