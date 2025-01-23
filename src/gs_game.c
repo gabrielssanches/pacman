@@ -64,6 +64,7 @@ struct line {
     Vector2 p1;
 };
 static int mouse_hold = 0;
+static int mouse_undo = 0;
 static int mouse_line_new = 0;
 static Vector2 mouse_line_p0;
 static Vector2 mouse_line_p1;
@@ -84,6 +85,15 @@ static void game_update(struct game_context *gctx) {
         game_time = now_ts;
     }
 
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && mouse_undo == 0) {
+        mouse_undo = 1;
+        if (mouse_line_count > 0) {
+            mouse_line_count--;
+        }
+    }
+    if (IsMouseButtonUp(MOUSE_BUTTON_RIGHT) && mouse_undo == 1) {
+        mouse_undo = 0;
+    }
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && mouse_hold == 0) {
         mouse_hold = 1;
         mouse_line_new = 0;
