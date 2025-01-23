@@ -444,10 +444,14 @@ $(PROJECT_BUILD_PATH):
 $(PROJECT_BUILD_PATH)/$(PROJECT_NAME): $(addprefix $(PROJECT_BUILD_PATH)/, $(OBJS))
 	$(CC) -o $@$(EXT) $^ $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
 
+DEPFLAGS = -MT $@ -MMD -MP -MF $(PROJECT_BUILD_PATH)/$*.d
+
 # Compile source files
 # NOTE: This pattern will compile every module defined on $(OBJS)
 $(PROJECT_BUILD_PATH)/%.o: %.c
-	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS) -D$(PLATFORM)
+	$(CC) -c $< -o $@ $(CFLAGS) $(DEPFLAGS) $(INCLUDE_PATHS) -D$(PLATFORM)
+
+-include $(subst .o,.d,$(shell find $(PROJECT_BUILD_PATH) -type f -name "*.d"))
 
 # all source files are dependent on Makefile
 $(PROJECT_SOURCE_FILES): Makefile
