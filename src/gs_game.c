@@ -13,17 +13,17 @@ struct pacman {
 struct pacman pacman;
 
 // character movement general rules
-// - can only move along the line
-// - can only change line if exactly on the right pixel
-// - stops if a wall is hit
+// - movement direction is always defined by UP,DOWN,LEFT,RIGHT
+// - movement can be changed to the current allowed directions
+// - allowed directions are defined on character spawning and on cross points
 // - movement is computed a pixel at a time, indenpendent of the speed.
 //   e.g.: x0 = 10, x1=14. Then needed checks are made at 10,11,12,13,14
 //   this is dump coding at the expense of cpu cycles
 //
 // pacman:
-// - always starts moving to the left
-// - if near a crossed/corner line (define near in pixels), line change is possible
-//   this is needed so the controls are a bit more forgiving to the player
+// - movement direction can be set to NONE
+// - always starts moving to the LEFT, on position x,y
+// - considered at cross point if near enough (2px distance max)
 // - held back one screen refresh if just ate a dot
 
 // line grid:
@@ -59,6 +59,10 @@ static void game_enter(struct game_context *gctx) {
     pacman.vel = Vector2Zero();
 }
 
+struct cross_point {
+    Vector2 pos;
+};
+
 struct line {
     Vector2 p0;
     Vector2 p1;
@@ -69,8 +73,8 @@ static int mouse_line_new = 0;
 static Vector2 mouse_line_p0;
 static Vector2 mouse_line_p1;
 
-static struct line mouse_line_grid[100];
-static int mouse_line_count = 0;
+static struct cross_point mouse_cross_point[100];
+static int mouse_point_count = 0;
 
 static Vector2 gridGetMousePosition(void) {
     Vector2 grid_pos = GetMousePosition();
@@ -87,8 +91,8 @@ static void game_update(struct game_context *gctx) {
 
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && mouse_undo == 0) {
         mouse_undo = 1;
-        if (mouse_line_count > 0) {
-            mouse_line_count--;
+        if (mouse_point_count > 0) {
+            mouse_point_count--;
         }
     }
     if (IsMouseButtonUp(MOUSE_BUTTON_RIGHT) && mouse_undo == 1) {
@@ -109,9 +113,8 @@ static void game_update(struct game_context *gctx) {
         mouse_hold = 0;
         mouse_line_new = 1;
         mouse_line_p1 = gridGetMousePosition();
-        mouse_line_grid[mouse_line_count].p0 = mouse_line_p0;
-        mouse_line_grid[mouse_line_count].p1 = mouse_line_p1;
-        mouse_line_count++;
+        mouse_cross_point[mouse_point_count].pos = mouse_line_p0;
+        mouse_point_count++;
     }
     if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
         Vector2 mouse_delta = GetMouseDelta();
@@ -193,16 +196,11 @@ static void game_draw(struct game_context *gctx) {
         DrawLineEx(line_sel.p0, line_sel.p1, 2.0f, GREEN);
     }
 
-    for (int line = 0; line < mouse_line_count; line++) {
-        struct line line_sel = mouse_line_grid[line];
-        DrawLineEx(line_sel.p0, line_sel.p1, 2.0f, GRAY);
+    for (int point = 0; point < mouse_point_count; point++) {
+        DrawCircleV(mouse_cross_point[point].pos, 2.0f, GREEN);
     }
     if (mouse_hold == 0) {
         DrawCircleV(mouse_line_p0, 2.0f, GRAY);
-    }
-    if (mouse_hold == 1) {
-        DrawLineEx(mouse_line_p0, mouse_line_p1, 4.0f, GRAY);
-        DrawCircleV(mouse_line_p1, 2.0f, GRAY);
     }
 
     // draw screen outline
@@ -210,6 +208,18 @@ static void game_draw(struct game_context *gctx) {
     screen_outline.width = RESOLUTION_WIDTH;
     screen_outline.height = RESOLUTION_HEIGHT;
     DrawRectangleLinesEx(screen_outline, 2.0, RED);
+
+    // draw tile grid
+    for (int row = 0; row <= 34; row++) {
+        Vector2 line_start = { 0.0f, row*32.0f };
+        Vector2 line_stop = { RESOLUTION_WIDTH, row*32.0f };
+        DrawLineEx(line_start, line_stop, 2.0f, GRAY);
+    }
+    for (int col = 0; col <= 28; col++) {
+        Vector2 line_start = { col*32.0f, 0.0f };
+        Vector2 line_stop = { col*32.0f, RESOLUTION_HEIGHT };
+        DrawLineEx(line_start, line_stop, 2.0f, GRAY);
+    }
 
     EndMode2D();
 
