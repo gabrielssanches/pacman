@@ -1,4 +1,4 @@
-## Asteruga
+## Pacman
 
 [PLAY IT HERE](https://gabrielssanches.itch.io/pacman)
 
@@ -7,6 +7,13 @@
 ### Description
 
 Pacman clone
+
+### Game Design
+
+
+
+
+
 
 ### Controls
 
@@ -22,11 +29,11 @@ Keyboard:
 
 ![screenshot1](screenshots/screenshot001.png)
 
-### Source references
+### References
 
-https://gameinternals.com/understanding-pac-man-ghost-behavior
-https://pacman.holenet.info/
-https://www.classicgaming.cc/classics/pac-man/the-game
+[1] https://gameinternals.com/understanding-pac-man-ghost-behavior
+[2] https://pacman.holenet.info/
+[3] https://www.classicgaming.cc/classics/pac-man/the-game
 
 ### Links
 
