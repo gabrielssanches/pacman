@@ -62,6 +62,13 @@ static Vector2 tile_convert_pos(Vector2 pos) {
     return pos_tile;
 }
 
+static Vector2 tile_convert_to_tile(Vector2 pos) {
+    Vector2 pos_tile = pos;
+    pos_tile.x = ((int)pos.x/TILEMAP_SIZE);
+    pos_tile.y = ((int)pos.y/TILEMAP_SIZE);
+    return pos_tile;
+}
+
 static void tile_highlight(Vector2 pos, Color color) {
     Vector2 pos_tile = tile_convert_pos(pos);
     Rectangle highlight_rect = { pos_tile.x, pos_tile.y, TILEMAP_SIZE, TILEMAP_SIZE };
@@ -90,6 +97,11 @@ struct ghost *ghost_pinky;
 struct ghost *ghost_inky;
 struct ghost *ghost_clyde;
 
+static void game_reset(void) {
+    pacman.pos = Vector2Zero();
+
+}
+
 void game_enter(struct game_context *gctx) {
     sprite_sheet = LoadTexture("resources/sprites/map.png");
     sprite_characters = LoadTexture("resources/sprites/characters.png");
@@ -101,6 +113,7 @@ void game_enter(struct game_context *gctx) {
     camera.zoom = 1.0f;
     //camera.zoom = (10*GetScreenHeight()/RESOLUTION_HEIGHT)/10.0f;
 
+    // characters initialization
     pacman.pos = Vector2Zero();
     pacman.pos.x = 48;
     pacman.pos.y = 144;
@@ -121,6 +134,8 @@ void game_enter(struct game_context *gctx) {
     ghost_clyde = &ghosts[GHOST_CLYDE];
     ghost_clyde->pos = (Vector2){ 32, 32*4 };
     ghost_clyde->highlight_color = ORANGE;
+
+    game_reset();
 }
 
 struct cross_point {
@@ -139,7 +154,6 @@ static Vector2 mouse_line_p1;
 
 static struct cross_point mouse_cross_point[100];
 static int mouse_point_count = 0;
-
 
 
 static Vector2 gridGetMousePosition(void) {
@@ -297,10 +311,8 @@ static void game_draw(struct game_context *gctx) {
 
     EndMode2D();
 
-    Vector2 mouse_pos = GetMousePosition();
-    mouse_pos = Vector2Subtract(mouse_pos, line_grid_offset);
-    mouse_pos.x = 16*((int)mouse_pos.x/16);
-    mouse_pos.y = 16*((int)mouse_pos.y/16);
+
+    Vector2 mouse_pos = tile_convert_to_tile(GetMousePosition());
     DrawText(TextFormat("%ix%i@%i zoom:%0.3f mouse:%0.3f,%0.3f", GetScreenWidth(), GetScreenHeight(), GetFPS(), camera.zoom, mouse_pos.x, mouse_pos.y), 30, 30, 30, BLUE);
 
     EndDrawing();
